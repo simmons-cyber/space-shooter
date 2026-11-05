@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VOID RUNNER — Orbital Defense</title>
+<meta name="description" content="Pilot the last ship through endless enemy waves. A free arcade space shooter with keyboard and touch controls, playable entirely offline.">
+<meta name="theme-color" content="#070e15">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%238efce0' d='M16 2 29 29 16 23 3 29Z'/%3E%3C/svg%3E">
+<style>
+:root{color-scheme:dark;--cyan:#8efce0;--muted:#748894}*{box-sizing:border-box}body{margin:0;background:#070e15;color:#e7f0f3;font-family:Arial,Helvetica,sans-serif}header{height:84px;border-bottom:1px solid #21303a;display:flex;align-items:center;justify-content:space-between;padding:0 5%}.brand{font-size:17px;font-weight:800;letter-spacing:3px}.brand span{color:var(--cyan);margin-right:12px}.tag{font:10px monospace;letter-spacing:2px;color:var(--muted)}.online{font:11px monospace;letter-spacing:1px}.online:before{content:'●';color:var(--cyan);margin-right:9px}main{max-width:1250px;margin:auto;padding:42px 32px 24px}.eyebrow{color:var(--cyan);font:10px monospace;letter-spacing:3px}h1{font-size:clamp(28px,4vw,46px);letter-spacing:-2px;margin:12px 0}h1 span{color:#758894;font-weight:400}.intro{display:flex;align-items:end;justify-content:space-between;margin-bottom:28px}.intro p{font-size:13px;color:#8c9ca6;margin:0}.serial{font:10px monospace;line-height:1.9;text-align:right;color:#708491}.shell{border:1px solid #314550;background:#0a141e;padding:8px;border-radius:5px;box-shadow:0 24px 90px #0005}.hud{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#101e29;border-bottom:1px solid #2b3d48}.label{font:9px monospace;letter-spacing:2px;color:#8296a3;margin-bottom:6px}.value{font:21px monospace;letter-spacing:2px}.hud-right{display:flex;gap:44px}.lives{color:var(--cyan);letter-spacing:5px}.arena{position:relative;height:min(56vw,540px);min-height:360px;overflow:hidden;background:#060d17}canvas{width:100%;height:100%;display:block;touch-action:none}.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(90deg,#07101b66,#07101b11,#07101b66)}.overlay.hidden{display:none}.card{padding:24px}.emblem{font-size:52px;color:var(--cyan);filter:drop-shadow(0 0 24px #64f9d980);margin-bottom:18px}.card h2{font-size:clamp(32px,5vw,58px);letter-spacing:7px;margin:12px 0}.card p{color:#94a9b7;font-size:13px;line-height:1.8}.button{border:0;background:var(--cyan);color:#0a2527;padding:17px 30px;font:bold 11px monospace;letter-spacing:2px;cursor:pointer;margin-top:18px;box-shadow:0 0 25px #8efce019}.button:hover{background:white}.hint{font:9px monospace;color:#708795;margin-top:19px;letter-spacing:2px}.arena-foot{padding:13px 20px;display:flex;justify-content:space-between;font:9px monospace;letter-spacing:1px;color:#72909e;border-top:1px solid #263a46}.controls{display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:25px;border-bottom:1px solid #23313b;padding-bottom:24px;gap:20px}.control{display:flex;align-items:center;gap:14px}.key{border:1px solid #354754;border-radius:3px;padding:8px 10px;font:11px monospace;color:#b2c6d0;white-space:nowrap}.control strong{display:block;font-size:11px;font-weight:500;margin-bottom:5px}.control small{font-size:10px;color:#6f8491}footer{display:flex;justify-content:space-between;margin-top:22px;font:9px monospace;letter-spacing:1.5px;color:#617986}#pause{background:none;border:1px solid #38515c;color:#b4cbd2;padding:8px 12px;cursor:pointer;font:11px monospace}button:focus-visible{outline:2px solid white;outline-offset:4px}@media(max-width:650px){header{height:65px}.tag,.serial{display:none}main{padding:27px 15px}.intro p{max-width:270px;line-height:1.7}.hud{padding:0 12px}.hud-right{gap:15px}.value{font-size:16px}.controls{gap:10px}.control{display:block}.key{display:inline-block;margin-bottom:10px}.control small{line-height:1.6;display:block}.arena-foot{font-size:8px;padding:12px 8px}.card h2{letter-spacing:3px}footer{font-size:8px}}
+
+.brand{white-space:nowrap}
+.online{white-space:nowrap}
+#pause{display:grid;place-items:center;min-width:40px;min-height:40px;align-self:center}
+#pause svg{display:block;width:16px;height:16px;fill:currentColor}
+#pause .play-icon{display:none}
+#pause[data-paused="true"] .pause-icon{display:none}
+#pause[data-paused="true"] .play-icon{display:block}
+#pause:disabled{opacity:.35;cursor:default}
+.arena-foot{gap:12px}
+.controls{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)}
+footer{gap:20px;line-height:1.7}
+@media(max-width:650px){
+  .hud{height:auto;min-height:78px;gap:12px;flex-wrap:wrap;padding:12px}
+  .hud-right{flex:1;justify-content:space-between;gap:12px}
+  .value{font-size:14px;letter-spacing:1px}
+  .lives{letter-spacing:2px}
+  .label{font-size:8px;letter-spacing:1px}
+  .arena-foot{flex-wrap:wrap;justify-content:center;text-align:center;line-height:1.5}
+  .key{font-size:9px;padding:8px 6px}
+  footer>span{flex:1}
+}
+@media(max-width:370px){
+  header{padding:0 15px}
+  .brand{font-size:13px;letter-spacing:2px}
+  .brand span{margin-right:5px}
+  .online{font-size:8px;letter-spacing:0}
+  .hud>div:first-child{flex-basis:100%}
+  .hud-right{width:100%}
+  .card{padding:18px}
+  .card h2{font-size:29px;letter-spacing:2px}
+  .emblem{font-size:38px;margin-bottom:10px}
+  .card .eyebrow{font-size:9px;letter-spacing:2px}
+  .card .button{margin-top:8px}
+  .hint{margin-top:14px}
+  .key{font-size:8px;letter-spacing:-.3px}
+}
+</style>
+</head>
+<body>
+<header><div class="brand"><span>✳</span>VOID RUNNER</div><div class="tag">INDEPENDENT ORBITAL DEFENSE SYSTEM</div><div class="online">SYSTEM ONLINE</div></header>
+<main><div class="intro"><div><div class="eyebrow">THE LAST LINE OF DEFENSE / 001</div><h1>Small ship. <span>Infinite space.</span></h1><p>Hold your ground. Clear the sector. Make every shot count.</p></div><div class="serial">SECTOR 07 — OUTER RIM<br>MISSION TYPE: SURVIVAL</div></div>
+<section class="shell" aria-label="Space shooter game"><div class="hud"><div><div class="label">SCORE</div><div class="value" id="score">000000</div></div><div class="hud-right"><div><div class="label">BEST</div><div class="value" id="best">000000</div></div><div><div class="label">WAVE</div><div class="value" id="wave">01</div></div><div><div class="label">HULL</div><div class="value lives" id="lives">◆◆◆</div></div><button id="pause" type="button" aria-label="Pause game" disabled><svg viewBox="0 0 20 20" aria-hidden="true"><path class="pause-icon" d="M4 3h4v14H4zM12 3h4v14h-4z"/><path class="play-icon" d="m5 2 12 8-12 8z"/></svg></button></div></div>
+<div class="arena"><canvas id="game" aria-label="Move with arrow keys or WASD, fire with Space. On touch screens drag to move and fire automatically.">Your browser needs HTML canvas support to play this game.</canvas><div class="overlay" id="overlay"><div class="card" aria-live="polite"><div class="emblem" aria-hidden="true">⟐</div><div class="eyebrow" id="status">YOUR SECTOR NEEDS YOU</div><h2 id="title">INTO THE VOID</h2><p id="message">An incoming fleet. One remaining pilot.<br>How long can you hold the line?</p><button class="button" id="start">LAUNCH MISSION ↗</button><div class="hint" id="hint">PRESS ENTER TO LAUNCH</div></div></div></div><div class="arena-foot"><span><span style="color:#8efce0">●</span> FLIGHT SYSTEMS READY</span><span id="sector">DEEP SPACE / SECTOR 07</span><span>SURVIVAL MODE</span></div></section>
+<div class="controls"><div class="control"><span class="key">W A S D / ↑ ↓ ← →</span><div><strong>Steer your ship</strong><small>Stay moving. Stay alive.</small></div></div><div class="control"><span class="key">SPACE</span><div><strong>Fire blasters</strong><small>Hold to keep firing.</small></div></div><div class="control"><span class="key">P / ESC</span><div><strong>Take a breather</strong><small>Pause and resume your mission.</small></div></div></div><footer><span>BUILT FOR THE BRAVE. LOST TO THE VOID.</span><span>TOUCH? DRAG TO FLY + AUTO FIRE ↗</span></footer></main>
+<script>
+'use strict';
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const $ = id => document.getElementById(id);
+const keys = new Set();
+const stars = Array.from({ length: 130 }, () => ({
+  x: Math.random(), y: Math.random(), z: Math.random()
+}));
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+let W = 1100, H = 540, state = 'ready';
+let score = 0, best = 0, wave = 1, lives = 3;
+let time = 0, spawn = 0, shot = 0, kills = 0, invincible = 0, last = 0;
+let touch = null, pointerId = null;
+let ship = { x: W / 2, y: H - 65 };
+let bullets = [], enemies = [], particles = [], enemyShots = [];
+
+try {
+  const saved = Number(localStorage.getItem('void-runner-best'));
+  if (Number.isSafeInteger(saved) && saved > 0) best = saved;
+} catch { /* Storage can be unavailable when the file is opened locally. */ }
+
+function resize() {
+  const rect = canvas.getBoundingClientRect();
+  const oldW = W, oldH = H;
+  W = Math.max(1, rect.width);
+  H = Math.max(1, rect.height);
+  const scale = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(W * scale);
+  canvas.height = Math.round(H * scale);
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  ship.x = clamp(ship.x / oldW * W, 20, W - 20);
+  ship.y = clamp(ship.y / oldH * H, 25, H - 25);
+  // Keep active objects in the same relative positions after rotation/resizing.
+  for (const object of [...bullets, ...enemies, ...enemyShots, ...particles]) {
+    object.x = object.x / oldW * W;
+    object.y = object.y / oldH * H;
+  }
+  clearInput();
+}
+
+function clearInput() {
+  keys.clear();
+  touch = null;
+  if (pointerId !== null && canvas.hasPointerCapture(pointerId)) {
+    canvas.releasePointerCapture(pointerId);
+  }
+  pointerId = null;
+}
+
+function hud() {
+  $('score').textContent = String(score).padStart(6, '0');
+  $('best').textContent = String(best).padStart(6, '0');
+  $('wave').textContent = String(wave).padStart(2, '0');
+  $('lives').textContent = '◆'.repeat(lives) + '◇'.repeat(3 - lives);
+  $('lives').setAttribute('aria-label', `${lives} of 3 hull points remaining`);
+  $('pause').disabled = state !== 'playing' && state !== 'paused';
+  $('pause').dataset.paused = String(state === 'paused');
+  $('pause').setAttribute('aria-label', state === 'paused' ? 'Resume game' : 'Pause game');
+}
+
+function recordBest() {
+  if (score <= best) return;
+  best = score;
+  try { localStorage.setItem('void-runner-best', String(best)); } catch {}
+}
+
+function launch() {
+  clearInput();
+  score = 0; wave = 1; lives = 3; kills = 0; time = 0;
+  spawn = .6; shot = 0; invincible = 1.5;
+  ship = { x: W / 2, y: H - 65 };
+  bullets = []; enemies = []; particles = []; enemyShots = [];
+  state = 'playing';
+  $('sector').textContent = 'DEEP SPACE / SECTOR 07';
+  $('overlay').classList.add('hidden');
+  hud();
+}
+
+function overlay(title, message, button) {
+  $('title').textContent = title;
+  $('message').textContent = message;
+  $('start').textContent = button;
+  $('status').textContent = state === 'paused' ? 'MISSION ON HOLD' : 'TRANSMISSION ENDED';
+  $('hint').textContent = state === 'paused' ? 'PRESS P TO RESUME' : 'PRESS ENTER TO RETRY';
+  $('overlay').classList.remove('hidden');
+  hud();
+}
+
+function pause() {
+  if (state === 'playing') {
+    state = 'paused';
+    clearInput();
+    overlay('HOLD POSITION', 'The void can wait. Your mission is paused.', 'RESUME MISSION ↗');
+  } else if (state === 'paused') {
+    state = 'playing';
+    $('overlay').classList.add('hidden');
+    hud();
+  }
+}
+
+$('start').onclick = () => state === 'paused' ? pause() : launch();
+$('pause').onclick = pause;
+const flightKeys = new Set(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+  'KeyW', 'KeyA', 'KeyS', 'KeyD']);
+window.addEventListener('keydown', event => {
+  if (event.code === 'Enter' && (state === 'ready' || state === 'over')) {
+    event.preventDefault();
+    if (!event.repeat) launch();
+    return;
+  }
+  if (event.code === 'KeyP' || event.code === 'Escape') {
+    if (!event.repeat) pause();
+    return;
+  }
+  if (state === 'playing' && flightKeys.has(event.code)) {
+    event.preventDefault();
+    keys.add(event.code);
+  }
+});
+window.addEventListener('keyup', event => keys.delete(event.code));
+function suspend() {
+  clearInput();
+  if (state === 'playing') pause();
+}
+window.addEventListener('blur', suspend);
+document.addEventListener('visibilitychange', () => { if (document.hidden) suspend(); });
+
+function pointer(event) {
+  const rect = canvas.getBoundingClientRect();
+  touch = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+}
+canvas.addEventListener('pointerdown', event => {
+  if (state !== 'playing' || !event.isPrimary || event.button !== 0 || pointerId !== null) return;
+  event.preventDefault();
+  pointerId = event.pointerId;
+  canvas.setPointerCapture(pointerId);
+  pointer(event);
+});
+canvas.addEventListener('pointermove', event => {
+  if (event.pointerId === pointerId) pointer(event);
+});
+for (const eventName of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+  canvas.addEventListener(eventName, event => {
+    if (event.pointerId === pointerId) {
+      touch = null;
+      pointerId = null;
+    }
+  });
+}
+
+function burst(x, y, color, count = 18) {
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2, speed = 30 + Math.random() * 150;
+    particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+      life: .3 + Math.random() * .5, color });
+  }
+}
+
+// Returns true on a fatal hit so the simulation stops on the exact final score.
+function hit() {
+  if (state !== 'playing' || invincible > 0) return false;
+  lives--;
+  invincible = 1.8;
+  burst(ship.x, ship.y, '#8efce0', 28);
+  if (lives === 0) {
+    state = 'over';
+    clearInput();
+    recordBest();
+    overlay('SIGNAL LOST',
+      `Final score: ${score.toLocaleString()} · Wave ${wave}. The sector remembers you.`,
+      'FLY AGAIN ↗');
+  }
+  hud();
+  return state === 'over';
+}
+
+function awardKill(enemy) {
+  enemy.dead = true;
+  score += 100;
+  kills++;
+  burst(enemy.x, enemy.y, '#ff9f87');
+  const nextWave = 1 + Math.floor(kills / 12);
+  if (nextWave !== wave) {
+    wave = nextWave;
+    $('sector').textContent = `WAVE ${wave} / HOSTILES INBOUND`;
+  }
+  recordBest();
+  hud();
+}
+
+function update(dt) {
+  time += dt; invincible -= dt; shot -= dt; spawn -= dt;
+  if (touch) {
+    ship.x += (touch.x - ship.x) * Math.min(1, dt * 14);
+    ship.y += (touch.y - ship.y) * Math.min(1, dt * 14);
+  } else {
+    const dx = Number(keys.has('KeyD') || keys.has('ArrowRight')) -
+      Number(keys.has('KeyA') || keys.has('ArrowLeft'));
+    const dy = Number(keys.has('KeyS') || keys.has('ArrowDown')) -
+      Number(keys.has('KeyW') || keys.has('ArrowUp'));
+    const length = Math.hypot(dx, dy) || 1;
+    ship.x += dx / length * 330 * dt;
+    ship.y += dy / length * 330 * dt;
+  }
+  ship.x = clamp(ship.x, 20, W - 20);
+  ship.y = clamp(ship.y, 25, H - 25);
+
+  if ((keys.has('Space') || touch) && shot <= 0) {
+    bullets.push({ x: ship.x - 7, y: ship.y - 19 }, { x: ship.x + 7, y: ship.y - 19 });
+    shot = .15;
+  }
+  if (spawn <= 0) {
+    enemies.push({ x: 25 + Math.random() * (W - 50), y: -30,
+      hp: wave > 3 ? 2 : 1, speed: 48 + wave * 12 + Math.random() * 28,
+      phase: Math.random() * 6, fire: 1 + Math.random() * 2 });
+    spawn = Math.max(.25, 1.05 - wave * .075);
+  }
+
+  for (const bullet of bullets) bullet.y -= 620 * dt;
+  for (const enemy of enemies) {
+    enemy.y += enemy.speed * dt;
+    enemy.x = clamp(enemy.x + Math.sin(time * 2 + enemy.phase) * 24 * dt, 20, W - 20);
+    if (Math.hypot(enemy.x - ship.x, enemy.y - ship.y) < 27 || enemy.y > H + 25) {
+      enemy.dead = true;
+      if (hit()) return;
+      continue;
+    }
+    for (const bullet of bullets) {
+      if (!bullet.dead && Math.abs(bullet.x - enemy.x) < 20 && Math.abs(bullet.y - enemy.y) < 19) {
+        bullet.dead = true;
+        enemy.hp--;
+        burst(bullet.x, bullet.y, '#ffb68b', 4);
+        if (enemy.hp <= 0) {
+          awardKill(enemy);
+          break;
+        }
+      }
+    }
+    if (enemy.dead) continue;
+    enemy.fire -= dt;
+    if (enemy.fire <= 0) {
+      const angle = Math.atan2(ship.y - enemy.y, ship.x - enemy.x);
+      enemyShots.push({ x: enemy.x, y: enemy.y,
+        vx: Math.cos(angle) * 160, vy: Math.sin(angle) * 160 });
+      enemy.fire = Math.max(.7, 3 - wave * .13);
+    }
+  }
+  for (const bullet of enemyShots) {
+    bullet.x += bullet.vx * dt;
+    bullet.y += bullet.vy * dt;
+    if (Math.hypot(bullet.x - ship.x, bullet.y - ship.y) < 15) {
+      bullet.dead = true;
+      if (hit()) return;
+    }
+  }
+  bullets = bullets.filter(b => !b.dead && b.y > -20);
+  enemies = enemies.filter(e => !e.dead);
+  enemyShots = enemyShots.filter(b => !b.dead && b.y > -30 && b.y < H + 30 && b.x > -30 && b.x < W + 30);
+}
+
+function draw(dt) {
+  ctx.fillStyle = '#060d17';
+  ctx.fillRect(0, 0, W, H);
+  const glow = ctx.createRadialGradient(W * .52, H * .4, 0, W * .52, H * .4, W * .6);
+  glow.addColorStop(0, '#122b3b77');
+  glow.addColorStop(1, '#060d1700');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+  for (const star of stars) {
+    if (state !== 'paused') star.y = (star.y + dt * (.015 + star.z * .045)) % 1;
+    ctx.fillStyle = `rgba(169,207,227,${.2 + star.z * .6})`;
+    ctx.fillRect(star.x * W, star.y * H, 1 + star.z, 1 + star.z * 2);
+  }
+  ctx.strokeStyle = '#30485730';
+  for (const radius of [105, 112]) {
+    ctx.beginPath();
+    ctx.arc(W * .8, H * .28, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.shadowColor = '#8efce0';
+  ctx.shadowBlur = 12;
+  ctx.fillStyle = '#aaffed';
+  for (const bullet of bullets) ctx.fillRect(bullet.x - 1.5, bullet.y - 9, 3, 15);
+  ctx.shadowBlur = 0;
+  for (const enemy of enemies) {
+    if (enemy.dead) continue;
+    ctx.save();
+    ctx.translate(enemy.x, enemy.y);
+    ctx.fillStyle = enemy.hp > 1 ? '#e0a7ff' : '#ff9a84';
+    ctx.beginPath();
+    ctx.moveTo(0, 18); ctx.lineTo(-20, -10); ctx.lineTo(-7, -5);
+    ctx.lineTo(0, -15); ctx.lineTo(7, -5); ctx.lineTo(20, -10);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#422d40';
+    ctx.fillRect(-3, -4, 6, 10);
+    ctx.restore();
+  }
+  ctx.fillStyle = '#ffb59b';
+  for (const bullet of enemyShots) {
+    if (bullet.dead) continue;
+    ctx.beginPath(); ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2); ctx.fill();
+  }
+  if (state === 'playing' || state === 'paused') {
+    ctx.save();
+    ctx.globalAlpha = invincible > 0 && Math.floor(invincible * 12) % 2 !== 0 ? .45 : 1;
+    ctx.translate(ship.x, ship.y);
+    ctx.fillStyle = '#78f8d5'; ctx.shadowColor = '#78f8d5'; ctx.shadowBlur = 18;
+    ctx.beginPath(); ctx.moveTo(-6, 15);
+    ctx.lineTo(0, 31 + Math.sin(time * 45) * 5); ctx.lineTo(6, 15); ctx.fill();
+    ctx.shadowBlur = 0; ctx.fillStyle = '#c0e6e9';
+    ctx.beginPath(); ctx.moveTo(0, -23); ctx.lineTo(18, 18);
+    ctx.lineTo(7, 12); ctx.lineTo(0, 17); ctx.lineTo(-7, 12); ctx.lineTo(-18, 18);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#359c9d';
+    ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(5, 8); ctx.lineTo(-5, 8); ctx.fill();
+    ctx.restore();
+  }
+  for (const particle of particles) {
+    if (state !== 'paused') {
+      particle.x += particle.vx * dt; particle.y += particle.vy * dt; particle.life -= dt;
+    }
+    ctx.globalAlpha = Math.max(0, particle.life);
+    ctx.fillStyle = particle.color;
+    ctx.fillRect(particle.x, particle.y, 3, 3);
+  }
+  ctx.globalAlpha = 1;
+  particles = particles.filter(p => p.life > 0);
+}
+
+function frame(now) {
+  const dt = Math.min((now - last) / 1000 || 0, .035);
+  last = now;
+  if (state === 'playing') update(dt);
+  draw(dt);
+  requestAnimationFrame(frame);
+}
+resize();
+new ResizeObserver(resize).observe(canvas);
+hud();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
